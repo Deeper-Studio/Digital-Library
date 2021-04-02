@@ -1,5 +1,6 @@
 package com.example.application.controller;
 
+import com.example.application.enumeration.PaperReviewStateEnum;
 import com.example.application.exception.StorageFileNotFoundException;
 import com.example.application.model.Paper;
 import com.example.application.repository.PaperRepository;
@@ -53,6 +54,7 @@ public class PaperController {
             Paper paper = new Paper();
             paper.setTitle(title);
             paper.setFilename(filename);
+            paper.setState(PaperReviewStateEnum.NOT_REVIEWED);
             paperRepository.save(paper);
 
         } catch (Exception e) {

@@ -1,5 +1,6 @@
 package com.example.application.model;
 
+import com.example.application.enumeration.PaperReviewStateEnum;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -25,4 +26,6 @@ public class Paper {
 
     @LastModifiedDate
     private Date lastModifiedDate;
+
+    private PaperReviewStateEnum state;
 }
