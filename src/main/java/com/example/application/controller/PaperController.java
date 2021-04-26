@@ -14,6 +14,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 @Controller
 @RequestMapping(path = "/paper")
 public class PaperController {
@@ -48,13 +51,22 @@ public class PaperController {
             @RequestParam String title
     ) {
         try {
-            paperStorageService.store(file);
-            String filename = file.getOriginalFilename();
+            // Modify the name of the uploaded file, in order to avoid duplication of name.
+            // The naming rule is to add the upload time after the original file name.
+            Date date = new Date();
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+            String createdDate = simpleDateFormat.format(date);
+            String originalFilename = file.getOriginalFilename();
+            String originalFilenameWithoutExtension = originalFilename.substring(0, originalFilename.length()-4);
+            String destinationFilename = originalFilenameWithoutExtension + createdDate + ".pdf";
 
+            // Store the uploaded file on disk with the modified name.
+            paperStorageService.store(file, destinationFilename);
+
+            // Save a new record in database.
             Paper paper = new Paper();
             paper.setTitle(title);
-            paper.setFilename(filename);
-            paper.setState(PaperReviewStateEnum.NOT_REVIEWED);
+            paper.setFilename(destinationFilename);
             paperRepository.save(paper);
 
         } catch (Exception e) {
