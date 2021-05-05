@@ -41,6 +41,20 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+
+        <!-- Dependencies for PdfAnalysisService -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>org.apache.pdfbox</artifactId>
+            <systemPath>${basedir}\src\lib\pdfbox-2.0.23.jar</systemPath>
+        </dependency>
+
+        <!-- Dependencies for AesService and PdfSignService -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>com.itextpdf</artifactId>
+            <systemPath>${basedir}\src\lib\itextpdf-5.5.10.jar</systemPath>
+        </dependency>
     </dependencies>
 
     <build>
