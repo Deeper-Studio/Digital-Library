@@ -1,6 +1,7 @@
 package com.example.application.model;
 
 import com.example.application.enumeration.PaperReviewStateEnum;
+import com.example.application.enumeration.ReviewerDecisionEnum;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Getter;
@@ -27,7 +28,7 @@ public class Paper {
 
     private String filename;
 
-    @ManyToMany(cascade = CascadeType.PERSIST) // 给当前设置的实体操作另一个实体的权限。
+    @ManyToMany(cascade = CascadeType.PERSIST) // Give the currently set entity the authority to operate another entity.
     private Set<Keyword> keywords;
 
     @CreatedDate
@@ -37,4 +38,16 @@ public class Paper {
     private Date lastModifiedDate;
 
     private PaperReviewStateEnum state;
+
+    private String comments1;
+
+    private ReviewerDecisionEnum decision1;
+
+    private String comments2;
+
+    private ReviewerDecisionEnum decision2;
+
+    private String comments3;
+
+    private ReviewerDecisionEnum decision3;
 }
