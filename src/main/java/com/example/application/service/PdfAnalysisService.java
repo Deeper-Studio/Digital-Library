@@ -17,18 +17,19 @@ import java.io.IOException;
 import java.util.Random;
 
 public class PdfAnalysisService {
-    private static String fileSrc = "D:\\PDFLoaded\\Test.pdf";
+    private static String fileSrc = "C:\\Users\\user\\Desktop\\Test\\Luke_Essay.pdf";
     private static String picFormat = "png";
     private static String picSuffix = "." + picFormat;
     private File file;
     private PDDocument pdDocument;
     private PDFRenderer pdfRenderer;
 
+
     private static int pageNumber = 0;
 
-    private static String title; //标题
-    private static String subject;//主题
-    private static String author;//作者
+    private static String title;
+    private static String subject;
+    private static String author;
     private static String keyWord;
     private static String creator;
     private static String creationDate;
@@ -58,6 +59,7 @@ public class PdfAnalysisService {
         }
         File file = new File(fileSrc);
         System.out.println("========= Properties of " + file.getName() + " =========");
+        System.out.println(file.getParent());
         System.out.println("title:---> " + title);
         System.out.println("subject:---> " + subject);
         System.out.println("author:---> " + author);
@@ -69,12 +71,9 @@ public class PdfAnalysisService {
     }
 
 
-    /**
-     *
-     * @param textDest
-     * @throws IOException
-     */
+    //Scan pdf and load the content to a txt document, then save in a specific address
     public void getContent (String textDest) throws IOException {
+        //If user does not set dest address(null) there has a default address for the output txt file.
         if(textDest == null){
             textDest = file.getParent() + "\\" + file.getName() + ".txt";
         }
@@ -84,8 +83,8 @@ public class PdfAnalysisService {
         fileWriter.write(text);
         fileWriter.close();
     }
-
-    public void convetPdfToPic () throws IOException {
+    //Convert all pages to picture file and save to a default address
+    public void convertPdfToPic () throws IOException {
         while (pageNumber < pdDocument.getNumberOfPages()) {
             BufferedImage image = pdfRenderer.renderImage(pageNumber);
             ImageIO.write(image, picFormat, new File(file.getAbsolutePath() + "WHOLE_" +
@@ -94,12 +93,14 @@ public class PdfAnalysisService {
         pageNumber = 0;
     }
 
-    public void convetPdfToPic (int pageNumber) throws IOException {
+    //Convert a specified page to picture file and save to a default address
+    public void convertPdfToPic (int pageNumber) throws IOException {
         BufferedImage image = pdfRenderer.renderImage(pageNumber);
         ImageIO.write(image, picFormat, new File(file.getAbsolutePath() + "WHOLE_" +
                 ++pageNumber + picSuffix));
     }
 
+    //Extract all pictures in the PDF file
     public void extractPic () throws IOException {
         while (pageNumber < pdDocument.getNumberOfPages()) {
             PDPage pdPage = pdDocument.getPage(pageNumber);
@@ -117,6 +118,7 @@ public class PdfAnalysisService {
         pageNumber = 0;
     }
 
+    //Extract all picture on specified page in the PDF file
     public void extractPic (int pageNumber) throws IOException {
         PDPage pdPage = pdDocument.getPage(pageNumber - 1);
         PDResources pdResources = pdPage.getResources();
@@ -129,5 +131,6 @@ public class PdfAnalysisService {
             }
         }
     }
+
 }
 

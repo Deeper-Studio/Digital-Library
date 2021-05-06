@@ -11,68 +11,72 @@ import com.itextpdf.text.pdf.security.*;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.security.*;
 import java.security.cert.Certificate;
 
 public class PdfSignService extends AesService{
-
-    private static char[] password = "18726077".toCharArray();//keystory密码
-    private static String fileSrc = "D:\\Download\\CNSCC212 Advance Programming\\Test.pdf" ;//原始pdf
-    private static String fileDest = "D:\\Download\\CNSCC212 Advance Programming\\Signed_Test.pdf" ;//签名完成的pdf
-    private static String stampPath = "D:\\Download\\CNSCC212 Advance Programming\\Stamp.png";//签章图片
-    private static String p12StreamPath = "D:\\Download\\CNSCC212 Advance Programming\\Certification.p12";
+    //Address must be refered to local computer!!!
+    private static char[] password = "WangJiawei18726077".toCharArray();//Password of keystory
+    private static String fileSrc = "C:\\Users\\user\\Desktop\\CNSCC212 Advanced Programming PDFSign\\Luke_Essay.pdf" ;//Original pdf
+    private static String fileDest = "C:\\Users\\user\\Desktop\\CNSCC212 Advanced Programming PDFSign\\Signed_Luke_Essay.pdf" ;//Pdf after Signed
+    private static String stampPath = "C:\\Users\\user\\Desktop\\CNSCC212 Advanced Programming PDFSign\\Stamp.png";//The stamp for visible signature
+    private static String p12StreamPath = "C:\\Users\\user\\Desktop\\CNSCC212 Advanced Programming PDFSign\\group2.p12";//Certification address
     private static String reason = "For CNSCC212 Advanced Programming";
     private static String location = "Weihai Campus, Beijing Jiaotong University\n" +
-                              "Xiandai Road 69, Nanhai Xinqu (Nanhai New Area)\n" +
-                              "Weihai City, Shandong, China";
+            "Xiandai Road 69, Nanhai Xinqu (Nanhai New Area)\n" +
+            "Weihai City, Shandong, China";
 
 
     public static void sign()
             throws GeneralSecurityException, IOException, DocumentException {
-        FileInputStream src = new FileInputStream(fileSrc);
-        FileOutputStream dest = new FileOutputStream(fileDest);
-        InputStream p12Stream = new FileInputStream(p12StreamPath);
+        FileInputStream src = new FileInputStream(fileSrc); //Load source file
+        FileOutputStream dest = new FileOutputStream(fileDest);//Set out put address
+        InputStream p12Stream = new FileInputStream(p12StreamPath);//Load certification
 
-        //读取keystore ，获得私钥和证书链
+        //Read the keystore and get the private key and certificate chain
         KeyStore keyStore = KeyStore.getInstance("PKCS12");
         keyStore.load(p12Stream, password);
         String alias = (String)keyStore.aliases().nextElement();
         PrivateKey privateKey = (PrivateKey) keyStore.getKey(alias, password);
         Certificate[] chain = keyStore.getCertificateChain(alias);
 
-        // Creating the reader and the stamper，开始pdfreader
+        // Creating the reader and the stamper，start pdfreader
         PdfReader reader = new PdfReader(src);
-        //目标文件输出流
-        //创建签章工具PdfStamper ，最后一个boolean参数
-        //false的话，pdf文件只允许被签名一次，多次签名，最后一次有效
-        //true的话，pdf可以被追加签名，验签工具可以识别出每次签名之后文档是否被修改
+        // The target file output stream
+        // Create the signature tool PdfStamper with the last Boolean parameter
+        // If false, PDF files can only be signed once, multiple times, and the last time valid
+        // If true, the PDF can be appended with signatures, and the checkmark tool can recognize whether the document
+        // has been modified after each signature
         PdfStamper stamper = PdfStamper.createSignature(reader, dest, '\0', null, false);
-        // 获取数字签章属性对象，设定数字签章的属性
+
+        // Get the digital signature property object and set the digital signature property
         PdfSignatureAppearance pdfSignatureAppearance = stamper.getSignatureAppearance();
         pdfSignatureAppearance.setReason(reason);
         pdfSignatureAppearance.setLocation(location);
-        //设置签名的位置，页码，签名域名称，多次追加签名的时候，签名域名称不能一样
-        //签名的位置，是图章相对于pdf页面的位置坐标，原点为pdf页面左下角
-        //四个参数的分别是，图章左下角x，图章左下角y，图章右上角x，图章右上角y
-        pdfSignatureAppearance.setVisibleSignature(new Rectangle(0, 800, 100, 700),reader.getNumberOfPages(), "sig1");
-        //pdfSignatureAppearance.setVisibleSignature(new Rectangle(Rectangle.ALIGN_RIGHT + 1, Rectangle.ALIGN_BOTTOM, Rectangle.ALIGN_RIGHT, Rectangle.ALIGN_BOTTOM+1), reader.getNumberOfPages(), "sig1");
-        //读取图章图片，这个image是itext包的image
+
+        // Set the signature location, page number, and name of the signature domain
+        // The position of the signature is the coordinate of the position of the seal relative to the PDF page,
+        // and the origin is the lower left corner of the PDF page
+        // The four parameters are: bottom left corner of stamp, bottom left corner of stamp,
+        // top right corner of stamp, top right corner of stamp
+        pdfSignatureAppearance.setVisibleSignature(new Rectangle(0, 800, 100, 700),1, "sig1");
+        // pdfSignatureAppearance.setVisibleSignature(new Rectangle(0, 800, 100, 700),reader.getNumberOfPages(), "sig1");
+        // pdfSignatureAppearance.setVisibleSignature(new Rectangle(Rectangle.ALIGN_RIGHT + 1, Rectangle.ALIGN_BOTTOM, Rectangle.ALIGN_RIGHT, Rectangle.ALIGN_BOTTOM+1), reader.getNumberOfPages(), "sig1");
+        // Read the stamp image. This image is the image of the iText package
         Image image = Image.getInstance(stampPath);
         pdfSignatureAppearance.setSignatureGraphic(image);
         pdfSignatureAppearance.setCertificationLevel(PdfSignatureAppearance.CERTIFIED_NO_CHANGES_ALLOWED);
-        //设置图章的显示方式
+
+        // Set the display mode of the stamp
         pdfSignatureAppearance.setRenderingMode(PdfSignatureAppearance.RenderingMode.GRAPHIC);
 
 
-        // 摘要算法
+        // Digest algorithm
         ExternalDigest digest = new BouncyCastleDigest();
-        // 签名算法
+        // Signature algorithm
         ExternalSignature signature = new PrivateKeySignature(privateKey, DigestAlgorithms.SHA1, null);
-        // 调用itext签名方法完成pdf签章CryptoStandard.CMS 签名方式
+        // Call the IText signature method to complete the PDF cryptostandard.cms signature
         MakeSignature.signDetached(pdfSignatureAppearance, digest, signature, chain, null, null, null, 0, MakeSignature.CryptoStandard.CMS);
     }
 
@@ -135,7 +139,7 @@ public class PdfSignService extends AesService{
         return AesService.aesEncrypt(password.toString(),AesService.keyGenerator()).toString();
     }
 
-
+    //Set all the properties at once
     public void setProperties(String fileSrc, String fileDest, String password, String stampPath, String p12StreamPath,
                               String reason , String location){
         setFileSrc(fileSrc);
