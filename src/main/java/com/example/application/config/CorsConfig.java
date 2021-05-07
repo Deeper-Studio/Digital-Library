@@ -10,11 +10,11 @@ import org.springframework.web.filter.CorsFilter;
 public class CorsConfig {
     private CorsConfiguration buildConfig() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-        // 1. 允许任何域名使用
+        // 1. Allow any origin
         corsConfiguration.addAllowedOrigin("*");
-        // 2. 允许任何头
+        // 2. Allow any header
         corsConfiguration.addAllowedHeader("*");
-        // 3. 允许任何方法（post、get等）
+        // 3. Allow any method (including GET, POST, etc.)
         corsConfiguration.addAllowedMethod("*");
         return corsConfiguration;
     }

@@ -63,7 +63,7 @@ public class PaperController {
             // Store the uploaded file on disk with the modified name.
             paperStorageService.store(file, destinationFilename);
 
-            // Save a new record in database.
+            // Create a new record in database.
             Paper paper = new Paper();
             paper.setTitle(title);
             paper.setFilename(destinationFilename);
